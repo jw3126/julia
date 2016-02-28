@@ -94,7 +94,7 @@ function test_cartesian(A, B)
     isgood = true
     for (IA, IB) in zip(eachindex(A), eachindex(B))
         if A[IA] != B[IB]
-            @show IA IB A[IA] B[IB] typeof(A) typeof(B) size(A) size(B)
+            @show IA IB A[IA] B[IB] typeof(A) typeof(B) size(A) size(B) parentindexes(A) parentindexes(B)
             isgood = false
             break
         end
