@@ -59,6 +59,7 @@ A = rand(1:20, 5, 5) .- 10
 B = rand(1:20, 5, 5) .- 10
 @test At_mul_B(A, B) == A'*B
 @test A_mul_Bt(A, B) == A*B'
+@test Ac_mul_Bt(A, B) == A'*B.'
 v = [1,2]
 C = Array(Int, 2, 2)
 @test @inferred(A_mul_Bc!(C, v, v)) == [1 2; 2 4]
@@ -151,6 +152,21 @@ end
 
 vecdot_(x,y) = invoke(vecdot, (Any,Any), x,y) # generic vecdot
 let A = [1+2im 3+4im; 5+6im 7+8im], B = [2+7im 4+1im; 3+8im 6+5im]
+    @test vecdot(A,B) == dot(vec(A),vec(B)) == vecdot_(A,B) == vecdot(float(A),float(B))
+    @test vecdot(Int[], Int[]) == 0 == vecdot_(Int[], Int[])
+    @test_throws MethodError vecdot(Any[], Any[])
+    @test_throws MethodError vecdot_(Any[], Any[])
+    for n1 = 0:2, n2 = 0:2, d in (vecdot, vecdot_)
+        if n1 != n2
+            @test_throws DimensionMismatch d(1:n1, 1:n2)
+        else
+            @test_approx_eq d(1:n1, 1:n2) vecnorm(1:n1)^2
+        end
+    end
+end
+
+#vecdot for generic reals as well
+let A = [1 3; 5 7], B = [2 4; 3 6]
     @test vecdot(A,B) == dot(vec(A),vec(B)) == vecdot_(A,B) == vecdot(float(A),float(B))
     @test vecdot(Int[], Int[]) == 0 == vecdot_(Int[], Int[])
     @test_throws MethodError vecdot(Any[], Any[])
