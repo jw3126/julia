@@ -577,6 +577,12 @@ function isready(rr::RemoteChannel, args...)
     end
 end
 
+function del_client(rr::AbstractRemoteRef)
+  del_client(remoteref_id(rr), myid())
+  @async delete!(client_refs, rr)  # NOTE : Remove @async once #14445 is fixed
+  nothing
+end
+
 del_client(id, client) = del_client(PGRP, id, client)
 function del_client(pg, id, client)
 # As a workaround to issue https://github.com/JuliaLang/julia/issues/14445
@@ -612,7 +618,7 @@ end
 
 function send_del_client(rr)
     if rr.where == myid()
-        del_client(remoteref_id(rr), myid())
+        del_client(rr)
     elseif rr.where in procs() # process only if a valid worker
         w = worker_from_id(rr.where)
         push!(w.del_msgs, (remoteref_id(rr), myid()))
