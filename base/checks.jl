@@ -1,5 +1,5 @@
 module Checks
-using Base.Meta
+using .Meta
 export @argcheck, @check
 
 abstract type AbstractCheckFlavor end
@@ -214,4 +214,3 @@ function fancy_error_message(info)
     join(lines, '\n')
 end
 end
-import .Checks: @argcheck, @check

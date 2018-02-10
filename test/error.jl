@@ -72,6 +72,9 @@ end
     @test retry(foo_kwargs)(3; y=4) == 7
 end
 
+# Checks tests
+using Base.Checks
+
 macro catch_exception_object(code)
     quote
         err = try

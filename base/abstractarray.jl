@@ -211,7 +211,7 @@ julia> first([1; 2; 3; 4])
 """
 function first(itr)
     state = start(itr)
-    @argcheck done(itr, state) "collection must be non-empty"
+    done(itr, state) && throw(ArgumentError("collection must be non-empty"))
     next(itr, state)[1]
 end
 
@@ -627,7 +627,9 @@ end
 
 # copy from an some iterable object into an AbstractArray
 function copyto!(dest::AbstractArray, dstart::Integer, src, sstart::Integer)
-    @argcheck sstart >= 1
+    if (sstart < 1)
+        throw(ArgumentError(string("source start offset (",sstart,") is < 1")))
+    end
     st = start(src)
     for j = 1:(sstart-1)
         if done(src, st)
@@ -653,12 +655,12 @@ end
 
 # this method must be separate from the above since src might not have a length
 function copyto!(dest::AbstractArray, dstart::Integer, src, sstart::Integer, n::Integer)
-    @argcheck n >= 0
+    n < 0 && throw(ArgumentError(string("tried to copy n=", n, " elements, but n should be nonnegative")))
     n == 0 && return dest
     dmax = dstart + n - 1
     inds = linearindices(dest)
     if (dstart ∉ inds || dmax ∉ inds) | (sstart < 1)
-        @argcheck sstart >= 1
+        sstart < 1 && throw(ArgumentError(string("source start offset (",sstart,") is < 1")))
         throw(BoundsError(dest, dstart:dmax))
     end
     st = start(src)
@@ -720,7 +722,7 @@ function copyto!(dest::AbstractArray, dstart::Integer,
                src::AbstractArray, sstart::Integer,
                n::Integer)
     n == 0 && return dest
-    @argcheck n >= 0
+    n < 0 && throw(ArgumentError(string("tried to copy n=", n, " elements, but n should be nonnegative")))
     destinds, srcinds = linearindices(dest), linearindices(src)
     (dstart ∈ destinds && dstart+n-1 ∈ destinds) || throw(BoundsError(dest, dstart:dstart+n-1))
     (sstart ∈ srcinds  && sstart+n-1 ∈ srcinds)  || throw(BoundsError(src,  sstart:sstart+n-1))
@@ -737,8 +739,14 @@ end
 
 function copyto!(B::AbstractVecOrMat{R}, ir_dest::AbstractRange{Int}, jr_dest::AbstractRange{Int},
                A::AbstractVecOrMat{S}, ir_src::AbstractRange{Int}, jr_src::AbstractRange{Int}) where {R,S}
-    @argcheck length(it_dest) == length(ir_src)
-    @argcheck length(jr_dest) == length(jr_src)
+    if length(ir_dest) != length(ir_src)
+        throw(ArgumentError(string("source and destination must have same size (got ",
+                                   length(ir_src)," and ",length(ir_dest),")")))
+    end
+    if length(jr_dest) != length(jr_src)
+        throw(ArgumentError(string("source and destination must have same size (got ",
+                                   length(jr_src)," and ",length(jr_dest),")")))
+    end
     @boundscheck checkbounds(B, ir_dest, jr_dest)
     @boundscheck checkbounds(A, ir_src, jr_src)
     jdest = first(jr_dest)

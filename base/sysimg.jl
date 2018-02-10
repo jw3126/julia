@@ -409,6 +409,7 @@ include("printf.jl")
 
 # metaprogramming
 include("meta.jl")
+include("checks.jl")
 
 # enums
 include("Enums.jl")
@@ -864,5 +865,4 @@ empty!(LOAD_PATH)
 
 Base.isfile("userimg.jl") && Base.include(Main, "userimg.jl")
 
-Base.include(Base, "checks.jl")
 Base.include(Base, "precompile.jl")
