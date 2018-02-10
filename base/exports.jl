@@ -1037,6 +1037,8 @@ export
     @polly,
 
     @assert,
+    @check,
+    @argcheck,
     @__dot__,
     @enum,
     @label,

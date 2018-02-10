@@ -109,6 +109,7 @@ include("range.jl")
 include("expr.jl")
 include("error.jl")
 
+
 # core numeric operations & types
 include("bool.jl")
 include("number.jl")
@@ -118,6 +119,7 @@ include("pointer.jl")
 include("refpointer.jl")
 include("checked.jl")
 using .Checked
+
 
 # vararg Symbol constructor
 Symbol(x...) = Symbol(string(x...))
@@ -862,4 +864,5 @@ empty!(LOAD_PATH)
 
 Base.isfile("userimg.jl") && Base.include(Main, "userimg.jl")
 
+Base.include(Base, "checks.jl")
 Base.include(Base, "precompile.jl")
